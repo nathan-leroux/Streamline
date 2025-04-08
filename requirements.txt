@@ -1,0 +1,10 @@
+Requirements
+
+to add these libraries open menus 'Tools' -> 'References' and select from list
+
+- Visual Basic for Applications
+- Microsoft Word 16.0 Object Library
+- Ole Automation
+- Microsoft Office 16.0 Object Library
+- Microsoft Visual Basic For Applications Extensibility 5.3
+- Microsoft Scripting Runtime
