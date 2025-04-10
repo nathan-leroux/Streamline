@@ -1,0 +1,47 @@
+## Instruction file
+#
+# All lines that start with a '#' are comments, and are ignored by the macro
+# Blank lines are also ignored
+#
+# Information on how the schema of this file is organised can be found on the README
+
+# Inbound
+/in
+12345678
+01-01-2025
+
+# Address
+/adr
+Amanda Hugginkiss
+p
+742 Evergreen Terrace
+Springfield 6000
+
+# Reason
+/res
+I fulfilled all expectations
+I have an outstanding record
+
+# Accounts
+# two accounts are provided by repeating 'name, value, payment no' twice in this example
+/acc
+exp.3
+1000
+11111
+Another Account 2
+4000
+22222
+
+# Outbound
+/out
+y
+details
+
+# Notes
+/not
+The client has no prior issues
+
+# Reply
+/rpy
+Example_Letter
+234 555 789

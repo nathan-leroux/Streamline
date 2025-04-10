@@ -27,15 +27,13 @@ End Sub
 
 Public Function open_doc(template_path As String)
     Dim fso As New Scripting.FileSystemObject
-    Dim abs_path As String
     Dim err_msg As String
     
-    abs_path = fso.BuildPath(ROOT_DIR, template_path)
-    If fso.FileExists(abs_path) Then
-        Set p_document = Documents.Open(FileName:=abs_path)
+    If fso.FileExists(template_path) Then
+        Set p_document = Documents.Open(FileName:=template_path)
         
     Else
-        err_msg = abs_path & " couldnt be found"
+        err_msg = template_path & " couldnt be found"
         Call err.Raise(ActivityError.BadDocumentError, Description:=err_msg)
         
     End If
@@ -61,16 +59,14 @@ Public Function close_doc(Optional save As Boolean = True)
 End Function
 
 
-Public Function save_doc(Optional file_name As String = "")
+Public Function save_doc(Optional letter_path As String = "")
     Dim fso As New Scripting.FileSystemObject
-    Dim abs_path As String
     
-    If file_name = vbNullString Then
+    If letter_path = vbNullString Then
         Call p_document.SaveAs2
         
     Else
-        abs_path = fso.BuildPath(ROOT_DIR, file_name)
-        Call p_document.SaveAs2(FileName:=abs_path)
+        Call p_document.SaveAs2(FileName:=letter_path)
     End If
 End Function
 
@@ -115,14 +111,11 @@ Public Function copy_desc()
 End Function
 
 
-Public Function export_to_pdf(file_name As String)
+Public Function export_to_pdf(pdf_path As String)
     Dim fso As New Scripting.FileSystemObject
-    Dim abs_path As String
-    
-    abs_path = fso.BuildPath(ROOT_DIR, file_name)
     
     If p_document.Saved Then
-        Call p_document.ExportAsFixedFormat(abs_path, wdExportFormatPDF, openafterexport:=True)
+        Call p_document.ExportAsFixedFormat(pdf_path, wdExportFormatPDF, openafterexport:=True)
     Else
         Call err.Raise(ActivityError.BadDocumentError, Description:=p_document.name & " has unsaved changes")
     End If
@@ -130,7 +123,7 @@ End Function
 
 
 Private Function fill_variables(section As WdStoryType)
-    Dim marker As range
+    Dim marker As Range
     Dim replacement_text As String
     Dim variable As String
     
@@ -155,7 +148,7 @@ End Function
 
 
 Private Function fill_conditionals(section As WdStoryType)
-    Dim marker As range
+    Dim marker As Range
     Dim conditional_array() As String
     Dim bool_str As String
     Dim true_str As String
@@ -193,7 +186,7 @@ End Function
 
 
 Private Function fill_tables(section As WdStoryType)
-    Dim marker As range
+    Dim marker As Range
     Dim target_table As Table
     Dim target_row As Row
     Dim lookup_colls As Scripting.Dictionary
@@ -212,7 +205,7 @@ Private Function fill_tables(section As WdStoryType)
     
         Set lookup_colls = New Scripting.Dictionary
         
-        For Each key In find_iterable_args(target_row.range).Keys
+        For Each key In find_iterable_args(target_row.Range).Keys
             Set returned_coll = p_activity.searchcoll(CStr(key))
             
             If returned_coll.Count = 0 Then
@@ -231,12 +224,12 @@ Private Function fill_tables(section As WdStoryType)
 End Function
 
 
-Private Function find_marker(start_range As range, pattern As String) As range
+Private Function find_marker(start_range As Range, pattern As String) As Range
     'find doesnt search within the range
     'it searches the entire doc and reasigns the range
     'cant change it now because it could mess up this whole class
     Dim search_success As Boolean
-    Dim marker As range
+    Dim marker As Range
     
     Set marker = start_range
     
@@ -254,7 +247,7 @@ Private Function find_marker(start_range As range, pattern As String) As range
 End Function
 
 
-Private Function check_marker_bounds(marker As range, start_bound As Long, end_bound As Long) As range
+Private Function check_marker_bounds(marker As Range, start_bound As Long, end_bound As Long) As Range
     'bit of spagette to make find_marker behave how its supposed to
     If marker Is Nothing Then
         Set check_marker_bounds = Nothing
@@ -268,7 +261,7 @@ Private Function check_marker_bounds(marker As range, start_bound As Long, end_b
 End Function
 
 
-Private Function split_conditional(input_range As range) As String()
+Private Function split_conditional(input_range As Range) As String()
     Dim input_string As String
     Dim result_array(3) As String
     Dim split_array() As String
@@ -295,7 +288,7 @@ Private Function split_conditional(input_range As range) As String()
 End Function
 
 
-Private Function remove_delims(input_range As range)
+Private Function remove_delims(input_range As Range)
     Dim result As String
     
     result = input_range.Text
@@ -304,7 +297,7 @@ Private Function remove_delims(input_range As range)
 End Function
 
 
-Private Function find_table(input_range As range, table_coll As Tables) As Table
+Private Function find_table(input_range As Range, table_coll As Tables) As Table
     Dim lil_table As Object
     Dim within_table As Boolean
     Dim result As Table
@@ -313,7 +306,7 @@ Private Function find_table(input_range As range, table_coll As Tables) As Table
     range_index = input_range.Start
     
     For Each lil_table In table_coll
-        With lil_table.range
+        With lil_table.Range
             within_table = .Start <= range_index And .End > range_index
         End With
         
@@ -337,7 +330,7 @@ Private Function find_table(input_range As range, table_coll As Tables) As Table
 End Function
 
 
-Private Function find_row(marker As range, rows_coll As Rows) As Row
+Private Function find_row(marker As Range, rows_coll As Rows) As Row
     Dim range_index As Long
     Dim result As Row
     Dim lil_row As Object
@@ -346,7 +339,7 @@ Private Function find_row(marker As range, rows_coll As Rows) As Row
     range_index = marker.Start
     
     For Each lil_row In rows_coll
-        With lil_row.range
+        With lil_row.Range
             within_row = .Start <= range_index And .End > range_index
         End With
         
@@ -365,10 +358,10 @@ Private Function find_row(marker As range, rows_coll As Rows) As Row
 End Function
 
 
-Private Function find_iterable_args(input_range As range) As Scripting.Dictionary
+Private Function find_iterable_args(input_range As Range) As Scripting.Dictionary
     Dim result As New Scripting.Dictionary
     Dim found_key As String
-    Dim marker As range
+    Dim marker As Range
     Dim start_bound As Long
     Dim end_bound As Long
     
@@ -416,7 +409,7 @@ End Function
 
 Private Function fill_rows(input_table As Table, input_row As Row, input_colls As Scripting.Dictionary)
     Dim target_row As Row
-    Dim marker As range
+    Dim marker As Range
     Dim replacement_text As String
     Dim start_row_index As Integer
     Dim iterable_len As Integer
@@ -426,21 +419,21 @@ Private Function fill_rows(input_table As Table, input_row As Row, input_colls A
     iterable_len = find_iterable_len(input_colls)
     Debug.Print iterable_len
     
-    Call input_row.range.Copy
+    Call input_row.Range.Copy
     ' one less as we use the original line
     For i = 1 To iterable_len - 1
-        Call input_row.range.Paste
+        Call input_row.Range.Paste
     Next i
     
     Set target_row = input_table.Rows(start_row_index)
     For i = 1 To iterable_len
-        Set marker = find_marker(target_row.range, SEARCH_TABLE)
+        Set marker = find_marker(target_row.Range, SEARCH_TABLE)
         
         Do While Not marker Is Nothing
             replacement_text = input_colls(remove_delims(marker))(i)
             marker.Text = replacement_text
             
-            Set marker = find_marker(target_row.range, SEARCH_TABLE)
+            Set marker = find_marker(target_row.Range, SEARCH_TABLE)
         Loop
         Set target_row = target_row.Next
     Next i
@@ -461,6 +454,6 @@ Private Function story_exists(input_story As WdStoryType) As Boolean
 End Function
 
 
-Private Function print_range(input_range As range)
+Private Function print_range(input_range As Range)
     Debug.Print "(" & input_range.Start & ", " & input_range.End & ")"
 End Function

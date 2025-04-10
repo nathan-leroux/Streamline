@@ -16,7 +16,6 @@ Private p_modules As Scripting.Dictionary
 Private p_lookup As Scripting.Dictionary
 
 Private p_note_path As String
-Private p_reply_path As String
 Private p_letter_paths As Collection
 
 
@@ -135,18 +134,17 @@ Public Function searchcoll(query As String) As Collection
     module = Split(query, ".")(0)
     argument = Split(query, ".")(1)
     result = ""
-
-    Set searchcoll = get_module(module).searchcoll(argument)
+    
+    If get_module(module).searchcoll(argument) Is Nothing Then
+        Call err.rasie(ActivityError.BadDocumentError, Description:="Invalid var name: " & query)
+    Else
+        Set searchcoll = get_module(module).searchcoll(argument)
+    End If
 End Function
 
 
 Public Property Get note_path() As String
     note_path = p_note_path
-End Property
-
-
-Public Property Get reply_path() As String
-    reply_path = p_reply_path
 End Property
 
 
@@ -191,23 +189,19 @@ Public Sub fill_paths()
     Set p_letter_paths = Nothing
     
     Select Case CLng(outcome_code)
-        Case OutcomeCode.Yes
-            p_note_path = "approved"
-            p_reply_path = "Notes\msg_approved"
-            Set p_letter_paths = fill_letter_paths(approved:=True)
+        Case OutcomeCode.yes
+            p_note_path = "example_note_approved"
+            Set p_letter_paths = fill_letter_paths()
             
         Case OutcomeCode.no
-            p_note_path = "denied"
-            p_reply_path = "Notes\msg_denied"
-            Set p_letter_paths = fill_letter_paths(approved:=False)
+            p_note_path = "example_note_denied"
+            Set p_letter_paths = fill_letter_paths()
             
         Case OutcomeCode.YesApproval
-            p_note_path = "approved_esc"
-            p_reply_path = ""
+            p_note_path = "example_note_approved_escalation"
             
         Case OutcomeCode.NoApproval
-            p_note_path = "denied_esc"
-            p_reply_path = ""
+            p_note_path = "example_note_denied_escalation"
             
         Case Else
             Call throw_exception("Outcome code not implemented: " & outcome_code & "'", ActivityError.BadInputError)
@@ -215,16 +209,10 @@ Public Sub fill_paths()
 End Sub
 
 
-Private Function fill_letter_paths(Optional approved As Boolean = False) As Collection
+Private Function fill_letter_paths() As Collection
     Dim outcome_string As String
     Dim pay_string As String
     Dim result_paths As New Collection
-    
-    If approved Then
-        outcome_string = "_approved"
-    Else
-        outcome_string = "_denied"
-    End If
     
     If Not Me.search("act.is_acc") Then
         pay_string = "_nopay"
@@ -234,13 +222,7 @@ Private Function fill_letter_paths(Optional approved As Boolean = False) As Coll
         pay_string = "_multipay"
     End If
     
-    If Me.search("act.is_ovr") Then
-        overdue_string = "_overdue"
-    Else
-        overdue_string = "_nooverdue"
-    End If
-    
-    Call results_paths.Add("example" & outcome_string & pay_string)
+    Call result_paths.Add("example_letter" & pay_string)
     
     Set fill_letter_paths = result_paths
 End Function

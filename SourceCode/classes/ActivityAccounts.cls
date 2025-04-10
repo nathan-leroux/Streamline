@@ -73,7 +73,7 @@ Private Sub fill_lookup()
         Call p_lookup.Add("full_name", account(ACC_NAME).full)
         Call p_lookup.Add("short_name", account(ACC_NAME).short)
         Call p_lookup.Add("abrev_name", account(ACC_NAME).abrev)
-        Call p_lookup.Add("prn", account(ACC_PRN))
+        Call p_lookup.Add("payment_number", account(ACC_PRN))
         Call p_lookup.Add("balance", Format(account(ACC_BAL), "Currency"))
         
     Else
@@ -93,7 +93,7 @@ Private Sub fill_lookup()
         Call p_coll_lookup.Add("short_name", name_short_coll)
         Call p_coll_lookup.Add("abrev_name", name_abrev_coll)
         
-        Call p_coll_lookup.Add("prn", collection_columnise(p_accounts, ACC_PRN))
+        Call p_coll_lookup.Add("payment_number", collection_columnise(p_accounts, ACC_PRN))
         
         Call p_coll_lookup.Add("balance", format_bal)
     End If

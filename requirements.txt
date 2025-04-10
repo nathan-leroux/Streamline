@@ -1,6 +1,7 @@
 Requirements
 
-to add these libraries open menus 'Tools' -> 'References' and select from list
+A few extra libraries are needed to run the macro.
+To add these libraries in the VBA editor, open menus 'Tools' -> 'References' and make sure the following are selected from the list.
 
 - Visual Basic for Applications
 - Microsoft Word 16.0 Object Library

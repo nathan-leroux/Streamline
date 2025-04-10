@@ -10,13 +10,13 @@ Option Explicit
 '     Dim act As New Activity
 '     Dim inst_file As New InstFile
 '     Dim file_name As String
-'     
+'
 '     Call inst_file.read_instfile(INSTFILE_PATH)
-'     
+'
 '     Call act.populate(inst_file)
-'     
+'
 '     file_name = act.search("rpy.id")
-'     
+'
 '     Call current_document.use_current_doc
 '     Call current_document.save_doc(file_name)
 '     Call current_document.populate_doc(act)
@@ -30,11 +30,11 @@ Option Explicit
 '     Dim current_document As New TemplateDocument
 '     Dim act As New Activity
 '     Dim inst_file As New InstFile
-'     
+'
 '     Call inst_file.read_instfile(INSTFILE_PATH)
-'     
+'
 '     Call act.populate(inst_file)
-'     
+'
 '     Call current_document.use_current_doc
 '     Call current_document.populate_doc(act)
 '     Call current_document.copy_desc
@@ -44,35 +44,46 @@ Option Explicit
 '     Call current_document.close_doc(save:=False)
 ' End Sub
 
+Public SCRIPT_ROOT_DIR As String
+Public SCRIPT_INSTFILE_PATH As String
+Public SCRIPT_LETTER_DIR As String
+Public SCRIPT_NOTE_DIR As String
+Public SCRIPT_OUTPUT_DIR As String
 
-Sub Act_full_notes()
+
+
+Private Function get_path()
+    SCRIPT_ROOT_DIR = ActiveDocument.AttachedTemplate.Path
+    
+    SCRIPT_INSTFILE_PATH = SCRIPT_ROOT_DIR & "\instruction_file.txt"
+    SCRIPT_LETTER_DIR = SCRIPT_ROOT_DIR & "\Letters\"
+    SCRIPT_NOTE_DIR = SCRIPT_ROOT_DIR & "\Notes\"
+    SCRIPT_OUTPUT_DIR = SCRIPT_ROOT_DIR & "\Output\"
+End Function
+
+Sub Complete_Notes()
     Dim act As New Activity
     Dim inst_file As New InstFile
     
     Dim note_doc As New TemplateDocument
     Dim reply_doc As New TemplateDocument
     
-    Call inst_file.read_instfile(INSTFILE_PATH)
+    Call get_path
+    
+    Call inst_file.read_instfile(SCRIPT_INSTFILE_PATH)
     
     Call act.populate(inst_file)
     
     If act.note_path <> vbNullString Then
-        Call note_doc.open_doc(act.note_path)
+        Call note_doc.open_doc(SCRIPT_NOTE_DIR & act.note_path & ".docx")
         Call note_doc.populate_doc(act)
         
         Call execute_note(note_doc)
     End If
-    
-    If act.reply_path <> vbNullString Then
-        Call reply_doc.open_doc(act.reply_path)
-        Call reply_doc.populate_doc(act)
-        
-        Call execute_reply(reply_doc)
-    End If
 End Sub
 
 
-Sub Act_full_letters()
+Sub Complete_Letters()
     Dim act As New Activity
     Dim inst_file As New InstFile
     
@@ -80,7 +91,9 @@ Sub Act_full_letters()
     Dim letter_name As String
     Dim letter_doc As TemplateDocument
     
-    Call inst_file.read_instfile(INSTFILE_PATH)
+    Call get_path
+    
+    Call inst_file.read_instfile(SCRIPT_INSTFILE_PATH)
     
     Call act.populate(inst_file)
     
@@ -89,12 +102,13 @@ Sub Act_full_letters()
         
         letter_name = act.search("rpy.id")
         
-        Call letter_doc.open_doc(LETTER_DIR & CStr(letter_path) & ".docx")
-        Call letter_doc.save_doc(letter_name)
+        Call letter_doc.open_doc(SCRIPT_LETTER_DIR & CStr(letter_path) & ".docx")
+
+        Call letter_doc.save_doc(SCRIPT_OUTPUT_DIR & letter_name)
         Call letter_doc.populate_doc(act)
     
         Call letter_doc.save_doc
-        Call letter_doc.export_to_pdf(letter_name & ".pdf")
+        Call letter_doc.export_to_pdf(SCRIPT_OUTPUT_DIR & letter_name & ".pdf")
     Next letter_path
 End Sub
 

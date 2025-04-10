@@ -15,7 +15,6 @@ Option Explicit
 Implements ActivityModule
 
 Private p_cli As String
-Private p_sender As String
 Private p_rec_date As TemplateDate
 Private p_flags As Collection
 
@@ -24,7 +23,6 @@ Private p_coll_lookup As Scripting.Dictionary
 
 
 Private Sub Class_Initialize()
-    Set p_flags = New Collection
     Set p_lookup = New Scripting.Dictionary
     Set p_coll_lookup = New Scripting.Dictionary
 End Sub
@@ -34,8 +32,6 @@ Public Function ActivityModule_populate(inst_file As InstFile)
     Dim parser As New TemplateParser
     
     p_cli = parse_cli(inst_file)
-
-    p_sender = inst_file.get_next_inst("arg").inst_value
     
     Set p_rec_date = parser.get_date(inst_file)
     
@@ -48,12 +44,7 @@ End Function
 
 
 Private Sub fill_lookup()
-    Call p_lookup.Add("is_rich", collection_exists(p_flags, InboundFlag.Rich))
-    Call p_lookup.Add("is_bp", collection_exists(p_flags, InboundFlag.Bp))
-    Call p_lookup.Add("is_mail", collection_exists(p_flags, InboundFlag.Mail))
-    
     Call p_lookup.Add("cli", format_cli(p_cli))
-    Call p_lookup.Add("sender", format_sender(p_sender))
     Call p_lookup.Add("date_full", p_rec_date.full)
     Call p_lookup.Add("date_short", p_rec_date.short)
 End Sub
@@ -92,10 +83,10 @@ Private Function parse_cli(inst_file As InstFile) As String
     new_str = inst_file.get_next_inst("arg").inst_value
     length = Len(new_str)
     
-    If length = 9 Or length = 11 Then
+    If length = 8 Then
         parse_cli = new_str
     Else
-        err_msg = "cli should be 9 or 11 long, was " & length
+        err_msg = "client no. should be 8 long, was " & length
         Call throw_exception(inst_file.throw_last_inst(err_msg), ActivityError.BadInputError)
     End If
 End Function
