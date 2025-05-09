@@ -40,10 +40,10 @@ This is a generalised version of the software. Developed for my job where i foun
 Ensure both Streamline.dotm and instruction_file.txt are open
 In Streamline.dotm, Navigate to View > Macros > View Macros
 
-To copy notes to clipboard, Select Complete_Notes and click Run
+To copy notes to clipboard, Select Complete_Notes and click Run.
 A description and a detailed note will be copied to clipboard successively.
 
-To create a letter, select Complete_Letters and click Run
+To create a letter, select Complete_Letters and click Run.
 A complete letter as both a .docx and .pdf will be saved in the "Output" folder.
 
 To change the content of the letters and notes, make changes to instruction_file.txt with the schema described below.
